@@ -6,29 +6,31 @@
  #define SS_PIN 10
 
  MFRC522 mfrc522(SS_PIN, RST_PIN);  // 创建MFRC522模型实例，定义ss和reset输入
-
+ 
+ MFRC522::StatusCode status;
  MFRC522::MIFARE_Key key;
  for (byte i = 0; i < 6; i++) key.keyByte[i] = 0x00; //初始化字典
 
- int Key_1=0;
- int Key_2=0;
- int Key_3=0;
- int Key_4=0;
- int Key_5=0;
- int Key_6=0;
+ int key_1=0;
+ int key_2=0;
+ int key_3=0;
+ int key_4=0;
+ int key_5=0;
+ int key_6=0;
 
  byte block  = 0; //结构：0～15块，每块的第四区存有6bit keyA，4bit 控制字, 6 bit KeyB
- MFRC522::StatusCode status;
+ byte buffer[18]; //预留块读取缓存
 
  void setup() 
  {
    SPI.begin(); // SPI初始化
    mfrc522.PCD_Init(); // MFRC522初始化
-   EEPROM.init();
  }
  
  void loop() 
  {
+  if (block > 15) return;
+	 
   if ( ! MFRC522.PICC_IsNewCardPresent()) //检查是否有卡
     return;
  
@@ -45,7 +47,7 @@
   if (piccType != MFRC522::PICC_TYPE_MIFARE_MINI &&  
     piccType != MFRC522::PICC_TYPE_MIFARE_1K &&
     piccType != MFRC522::PICC_TYPE_MIFARE_4K) {
-    Serial.println("不支持读取此卡类型");
+    Serial.println("不支持读取此卡");
     return;
   }else{
   Serial.println(mfrc522.PICC_GetTypeName(piccType));
@@ -57,48 +59,69 @@
      for (key_4=0;key_4<256;key_4++){
       for (key_5=0;key_5<256;key_5++){
        for (key_6=0;key_6<256;key_6++){
-         key={(unsigned char)key_1,(unsigned char)key_2,(unsigned char)key_3,(unsigned char)key_4,(unsigned char)key_5,(unsigned char)key_6};
+           key={(unsigned char)key_1,(unsigned char)key_2,(unsigned char)key_3,(unsigned char)key_4,(unsigned char)key_5,(unsigned char)key_6};
            status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, block, &key, &(mfrc522.uid));
            if (status == MFRC522::STATUS_OK) {
               delay(5000);
               Serial.print("PCD_Authenticate OK");
-              EEPROM.write(block,)
-           }
+              EEPROM.write(block*6-1,key_1);
+	`     EEPROM.write(block*6-1+1,key_2);
+	      EEPROM.write(block*6-1+2,key_3);
+	      EEPROM.write(block*6-1+3,key_4);
+	      EEPROM.write(block*6-1+4,key_5);
+	      EEPROM.write(block*6-1+5,key_6);
+	
+	      // 读取块中数据
+              byte byteCount = sizeof(buffer);
+	      status = mfrc522.MIFARE_Read(block, buffer, &byteCount);
+              if (status != MFRC522::STATUS_OK) {
+		    Serial.print("MIFARE_Read() failed: ");
+		    Serial.println(mfrc522.GetStatusCodeName(status));
+	      }
+	      else{
+	      	for (byte index = 0; index < 16; index++) {
+		    Serial.print(buffer[index] < 0x10 ? " 0" : " ");
+		    Serial.print(buffer[index], HEX);
+		    if ((index % 4) == 3) Serial.print(" ");
+	      	}
+	      }
+		 
+              Serial.println("Key is: ");
+	      Serial.print((unsigned char)key_1,HEX);
+	      Serial.print((unsigned char)key_2,HEX);
+	      Serial.print((unsigned char)key_3,HEX);
+	      Serial.print((unsigned char)key_4,HEX);
+	      Serial.print((unsigned char)key_5,HEX);
+	      Serial.println((unsigned char)key_6,HEX);
+	      Serial.print("Block:");
+	      Serial.println(block);
+	      
+	      Key_1=0;
+	      Key_2=0;
+	      Key_3=0;
+	      Key_4=0;
+	      Key_5=0;
+	      Key_6=0;  
+	      block++;
 
+	      mfrc522.PICC_HaltA(); // Halt PICC
+	      mfrc522.PCD_StopCrypto1();  // Stop encryption on PCD
 
+	   }else{
+	   	Serial.println("Just Now trying: ");
+	   	Serial.print((unsigned char)key_1,HEX);
+	   	Serial.print((unsigned char)key_2,HEX);
+	   	Serial.print((unsigned char)key_3,HEX);
+		Serial.print((unsigned char)key_4,HEX);
+	   	Serial.print((unsigned char)key_5,HEX);
+	   	Serial.println((unsigned char)key_6,HEX);
+	   	Serial.print("Block:");
+	   	Serial.println(block);
+	   }
        }
       }
      }
     }
    }
-  }
-  
-       status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, block, &key, &(mfrc522.uid));
-        if (status != MFRC522::STATUS_OK) {
-           Serial.print("PCD_Authenticate() failed: ");
-           Serial.println(mfrc522.GetStatusCodeName(status));
-           return;
-        }
-        
-        // Read block
-	byte byteCount = sizeof(buffer);
-	status = mfrc522.MIFARE_Read(block, buffer, &byteCount);
-	if (status != MFRC522::STATUS_OK) {
-	    Serial.print("MIFARE_Read() failed: ");
-	    Serial.println(mfrc522.GetStatusCodeName(status));
-	}
-        else  // Dump data
-	for (byte index = 0; index < 16; index++) {
-	    Serial.print(buffer[index] < 0x10 ? " 0" : " ");
-	    Serial.print(buffer[index], HEX);
-	    if ((index % 4) == 3) Serial.print(" ");
-	}
-        Serial.println(" ");
-        mfrc522.PICC_HaltA(); // Halt PICC
-        mfrc522.PCD_StopCrypto1();  // Stop encryption on PCD
-       
+  }       
 }
-  
-  PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, (byte)1, &key, &uid);
-  
- }
