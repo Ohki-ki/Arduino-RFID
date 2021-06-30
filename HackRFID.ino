@@ -19,7 +19,7 @@
  int key_6=0;
 
  byte block  = 0; //结构：0～15块，每块的第四区存有6bit keyA，4bit 控制字, 6 bit KeyB
- byte buffer[18]; //预留块读取缓存
+ byte buffer[18]; //预留区读取缓存
 
  void setup() 
  {
@@ -71,7 +71,7 @@
 	      EEPROM.write(block*6-1+4,key_5);
 	      EEPROM.write(block*6-1+5,key_6);
 	
-	      // 读取块中数据
+	      // 读取区中数据
               byte byteCount = sizeof(buffer);
 	      status = mfrc522.MIFARE_Read(block, buffer, &byteCount);
               if (status != MFRC522::STATUS_OK) {
