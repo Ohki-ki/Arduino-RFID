@@ -79,39 +79,43 @@
                 Serial.println(mfrc522.GetStatusCodeName(status));
               }
               else{
-                for (byte index = 0; index < 16; index++) {
-                Serial.print(buffer[index] < 0x10 ? " 0" : " ");
-                Serial.print(buffer[index], HEX);
-                if ((index % 4) == 3) Serial.print(" ");
-                }
+                printHex(buffer, 16);
               }
      
-          Serial.println("Key is: ");
-          printHex(key.keyByte, MFRC522::MF_KEY_SIZE);
-          Serial.print("/t Block:");
-          Serial.println(block);
+             Serial.println("Key is: ");
+             printHex(key.keyByte, MFRC522::MF_KEY_SIZE);
+             Serial.print("/t Block:");
+             Serial.println(block);
 
-          key_1=0;
-          key_2=0;
-          key_3=0;
-          key_4=0;
-          key_5=0;
-          key_6=0;  
-          block++;
+             key_1=0;
+             key_2=0;
+             key_3=0;
+             key_4=0;
+             key_5=0;
+             key_6=0;  
+             block++;
 
-          mfrc522.PICC_HaltA(); // Halt PICC
-          mfrc522.PCD_StopCrypto1();  // Stop encryption on PCD
+             mfrc522.PICC_HaltA(); // Halt PICC
+             mfrc522.PCD_StopCrypto1();  // Stop encryption on PCD
 
-         }else{
-          Serial.println("Just Now trying: ");
-          printHex(key.keyByte, MFRC522::MF_KEY_SIZE);
-          Serial.print("/t Block:");
-          Serial.println(block);
-         }
+            }else{
+             Serial.println("Just Now trying: ");
+             printHex(key.keyByte, MFRC522::MF_KEY_SIZE);
+             Serial.print("/t Block:");
+             Serial.println(block);
+            }
        }
       }
      }
     }
    }
   }       
+}
+
+void printHex(byte *Buffer, byte BufferSize) {
+  for (byte i = 0; i < BufferSize; i++) {
+    Serial.print(Buffer[i] < 0x10 ? " 0" : " ");
+    Serial.print(Buffer[i], HEX);
+    if ((BufferSize % 4) == 3) Serial.print("/t");
+  }
 }
