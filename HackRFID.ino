@@ -118,7 +118,7 @@ void printHex(byte *Buffer, byte BufferSize) {
   for (byte i = 0; i < BufferSize; i++) {
     Serial.print(Buffer[i] < 0x10 ? " 0" : " ");
     Serial.print(Buffer[i], HEX);
-    if ((BufferSize % 6) == 5) Serial.print("/t");
+    if ((i % 6) == 5) Serial.print("/t");
   }
 }
 
@@ -126,7 +126,7 @@ void printHex16(byte *Buffer, byte BufferSize) {
   for (byte i = 0; i < BufferSize; i++) {
     Serial.print(Buffer[i] < 0x10 ? " 0" : " ");
     Serial.print(Buffer[i], HEX);
-    if ((BufferSize % 16) == 15) Serial.print("/t");
+    if ((i % 16) == 15) Serial.print("/t");
   }
 }
 
@@ -134,6 +134,6 @@ void printDec16(byte *Buffer, byte BufferSize) {
   for (byte i = 0; i < BufferSize; i++) {
     Serial.print(Buffer[i] < 0x10 ? " 0" : " ");
     Serial.print(Buffer[i], DEC);
-    if ((BufferSize % 16) == 15) Serial.print("/t");
+    if ((i % 16) == 15) Serial.print("/t");
   }
 }
