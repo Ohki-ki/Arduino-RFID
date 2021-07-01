@@ -79,12 +79,15 @@
                 Serial.println(mfrc522.GetStatusCodeName(status));
               }
               else{
-                printHex(buffer, 16);
+                Serial.println("当前区的HEX数据: ");
+                printHex16(buffer, 16);
+                Serial.println("当前区的DEC数据: ");
+                printDec16(buffer, 16);
               }
      
              Serial.println("Key is: ");
              printHex(key.keyByte, MFRC522::MF_KEY_SIZE);
-             Serial.print("/t Block:");
+             Serial.print("Block:");
              Serial.println(block);
 
              key_1=0;
@@ -100,7 +103,7 @@
             }else{
              Serial.println("Just Now trying: ");
              printHex(key.keyByte, MFRC522::MF_KEY_SIZE);
-             Serial.print("/t Block:");
+             Serial.print("Block:");
              Serial.println(block);
             }
        }
@@ -115,6 +118,22 @@ void printHex(byte *Buffer, byte BufferSize) {
   for (byte i = 0; i < BufferSize; i++) {
     Serial.print(Buffer[i] < 0x10 ? " 0" : " ");
     Serial.print(Buffer[i], HEX);
-    if ((BufferSize % 4) == 3) Serial.print("/t");
+    if ((BufferSize % 6) == 5) Serial.print("/t");
+  }
+}
+
+void printHex16(byte *Buffer, byte BufferSize) {
+  for (byte i = 0; i < BufferSize; i++) {
+    Serial.print(Buffer[i] < 0x10 ? " 0" : " ");
+    Serial.print(Buffer[i], HEX);
+    if ((BufferSize % 16) == 15) Serial.print("/t");
+  }
+}
+
+void printDec16(byte *Buffer, byte BufferSize) {
+  for (byte i = 0; i < BufferSize; i++) {
+    Serial.print(Buffer[i] < 0x10 ? " 0" : " ");
+    Serial.print(Buffer[i], DEC);
+    if ((BufferSize % 16) == 15) Serial.print("/t");
   }
 }
