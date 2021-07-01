@@ -51,7 +51,9 @@
     return;
   }else{
   Serial.println(mfrc522.PICC_GetTypeName(piccType));
-  }  
+  }
+  
+  mfrc522.PICC_DumpDetailsToSerial(&(mfrc522.uid));
  
   for (key_1=0;key_1<256;key_1++){
    for (key_2=0;key_2<256;key_2++){
