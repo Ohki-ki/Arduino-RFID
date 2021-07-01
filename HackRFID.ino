@@ -94,10 +94,9 @@
              key_5=0;
              key_6=0;  
              block++;
-
              mfrc522.PICC_HaltA(); // Halt PICC
              mfrc522.PCD_StopCrypto1();  // Stop encryption on PCD
-
+             return;
             }else{
              Serial.println("Just Now trying: ");
              printHex(key.keyByte, MFRC522::MF_KEY_SIZE);
