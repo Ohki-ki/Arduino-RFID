@@ -71,53 +71,43 @@
               EEPROM.write(block*6-1+4,key_5);
               EEPROM.write(block*6-1+5,key_6);
   
-        // 读取区中数据
+              // 读取区中数据
               byte byteCount = sizeof(buffer);
-        status = mfrc522.MIFARE_Read(block, buffer, &byteCount);
+              status = mfrc522.MIFARE_Read(block, buffer, &byteCount);
               if (status != MFRC522::STATUS_OK) {
-        Serial.print("MIFARE_Read() failed: ");
-        Serial.println(mfrc522.GetStatusCodeName(status));
-        }
-        else{
-          for (byte index = 0; index < 16; index++) {
-        Serial.print(buffer[index] < 0x10 ? " 0" : " ");
-        Serial.print(buffer[index], HEX);
-        if ((index % 4) == 3) Serial.print(" ");
-          }
-        }
+                Serial.print("MIFARE_Read() failed: ");
+                Serial.println(mfrc522.GetStatusCodeName(status));
+              }
+              else{
+                for (byte index = 0; index < 16; index++) {
+                Serial.print(buffer[index] < 0x10 ? " 0" : " ");
+                Serial.print(buffer[index], HEX);
+                if ((index % 4) == 3) Serial.print(" ");
+                }
+              }
      
-              Serial.println("Key is: ");
-        Serial.print((unsigned char)key_1,HEX);
-        Serial.print((unsigned char)key_2,HEX);
-        Serial.print((unsigned char)key_3,HEX);
-        Serial.print((unsigned char)key_4,HEX);
-        Serial.print((unsigned char)key_5,HEX);
-        Serial.println((unsigned char)key_6,HEX);
-        Serial.print("Block:");
-        Serial.println(block);
-        
-        key_1=0;
-        key_2=0;
-        key_3=0;
-        key_4=0;
-        key_5=0;
-        key_6=0;  
-        block++;
+          Serial.println("Key is: ");
+          printHex(key.keyByte, MFRC522::MF_KEY_SIZE);
+          Serial.print("/t Block:");
+          Serial.println(block);
 
-        mfrc522.PICC_HaltA(); // Halt PICC
-        mfrc522.PCD_StopCrypto1();  // Stop encryption on PCD
+          key_1=0;
+          key_2=0;
+          key_3=0;
+          key_4=0;
+          key_5=0;
+          key_6=0;  
+          block++;
 
-     }else{
-      Serial.println("Just Now trying: ");
-      Serial.print((unsigned char)key_1,HEX);
-      Serial.print((unsigned char)key_2,HEX);
-      Serial.print((unsigned char)key_3,HEX);
-    Serial.print((unsigned char)key_4,HEX);
-      Serial.print((unsigned char)key_5,HEX);
-      Serial.println((unsigned char)key_6,HEX);
-      Serial.print("Block:");
-      Serial.println(block);
-     }
+          mfrc522.PICC_HaltA(); // Halt PICC
+          mfrc522.PCD_StopCrypto1();  // Stop encryption on PCD
+
+         }else{
+          Serial.println("Just Now trying: ");
+          printHex(key.keyByte, MFRC522::MF_KEY_SIZE);
+          Serial.print("/t Block:");
+          Serial.println(block);
+         }
        }
       }
      }
