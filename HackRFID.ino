@@ -9,7 +9,6 @@
  
  MFRC522::StatusCode status;
  MFRC522::MIFARE_Key key;
- for (byte i = 0; i < 6; i++) key.keyByte[i] = 0x00; //初始化字典
 
  int key_1=0;
  int key_2=0;
@@ -25,16 +24,17 @@
  {
    SPI.begin(); // SPI初始化
    mfrc522.PCD_Init(); // MFRC522初始化
+   for (byte i = 0; i < 6; i++) key.keyByte[i] = 0x00; //初始化字典
  }
  
  void loop() 
  {
   if (block > 15) return;
-	 
-  if ( ! MFRC522.PICC_IsNewCardPresent()) //检查是否有卡
+   
+  if (!mfrc522.PICC_IsNewCardPresent()) //检查是否有卡
     return;
  
-  if ( ! MFRC522.PICC_ReadCardSerial()) // 验证NUID是否可读
+  if (!mfrc522.PICC_ReadCardSerial()) // 验证NUID是否可读
     return;
  
   Serial.print("Card UID:");    //可读则输出UID
@@ -65,59 +65,59 @@
               delay(5000);
               Serial.print("PCD_Authenticate OK");
               EEPROM.write(block*6-1,key_1);
-	`     EEPROM.write(block*6-1+1,key_2);
-	      EEPROM.write(block*6-1+2,key_3);
-	      EEPROM.write(block*6-1+3,key_4);
-	      EEPROM.write(block*6-1+4,key_5);
-	      EEPROM.write(block*6-1+5,key_6);
-	
-	      // 读取区中数据
+              EEPROM.write(block*6-1+1,key_2);
+              EEPROM.write(block*6-1+2,key_3);
+              EEPROM.write(block*6-1+3,key_4);
+              EEPROM.write(block*6-1+4,key_5);
+              EEPROM.write(block*6-1+5,key_6);
+  
+        // 读取区中数据
               byte byteCount = sizeof(buffer);
-	      status = mfrc522.MIFARE_Read(block, buffer, &byteCount);
+        status = mfrc522.MIFARE_Read(block, buffer, &byteCount);
               if (status != MFRC522::STATUS_OK) {
-		    Serial.print("MIFARE_Read() failed: ");
-		    Serial.println(mfrc522.GetStatusCodeName(status));
-	      }
-	      else{
-	      	for (byte index = 0; index < 16; index++) {
-		    Serial.print(buffer[index] < 0x10 ? " 0" : " ");
-		    Serial.print(buffer[index], HEX);
-		    if ((index % 4) == 3) Serial.print(" ");
-	      	}
-	      }
-		 
+        Serial.print("MIFARE_Read() failed: ");
+        Serial.println(mfrc522.GetStatusCodeName(status));
+        }
+        else{
+          for (byte index = 0; index < 16; index++) {
+        Serial.print(buffer[index] < 0x10 ? " 0" : " ");
+        Serial.print(buffer[index], HEX);
+        if ((index % 4) == 3) Serial.print(" ");
+          }
+        }
+     
               Serial.println("Key is: ");
-	      Serial.print((unsigned char)key_1,HEX);
-	      Serial.print((unsigned char)key_2,HEX);
-	      Serial.print((unsigned char)key_3,HEX);
-	      Serial.print((unsigned char)key_4,HEX);
-	      Serial.print((unsigned char)key_5,HEX);
-	      Serial.println((unsigned char)key_6,HEX);
-	      Serial.print("Block:");
-	      Serial.println(block);
-	      
-	      Key_1=0;
-	      Key_2=0;
-	      Key_3=0;
-	      Key_4=0;
-	      Key_5=0;
-	      Key_6=0;  
-	      block++;
+        Serial.print((unsigned char)key_1,HEX);
+        Serial.print((unsigned char)key_2,HEX);
+        Serial.print((unsigned char)key_3,HEX);
+        Serial.print((unsigned char)key_4,HEX);
+        Serial.print((unsigned char)key_5,HEX);
+        Serial.println((unsigned char)key_6,HEX);
+        Serial.print("Block:");
+        Serial.println(block);
+        
+        key_1=0;
+        key_2=0;
+        key_3=0;
+        key_4=0;
+        key_5=0;
+        key_6=0;  
+        block++;
 
-	      mfrc522.PICC_HaltA(); // Halt PICC
-	      mfrc522.PCD_StopCrypto1();  // Stop encryption on PCD
+        mfrc522.PICC_HaltA(); // Halt PICC
+        mfrc522.PCD_StopCrypto1();  // Stop encryption on PCD
 
-	   }else{
-	   	Serial.println("Just Now trying: ");
-	   	Serial.print((unsigned char)key_1,HEX);
-	   	Serial.print((unsigned char)key_2,HEX);
-	   	Serial.print((unsigned char)key_3,HEX);
-		Serial.print((unsigned char)key_4,HEX);
-	   	Serial.print((unsigned char)key_5,HEX);
-	   	Serial.println((unsigned char)key_6,HEX);
-	   	Serial.print("Block:");
-	   	Serial.println(block);
-	   }
+     }else{
+      Serial.println("Just Now trying: ");
+      Serial.print((unsigned char)key_1,HEX);
+      Serial.print((unsigned char)key_2,HEX);
+      Serial.print((unsigned char)key_3,HEX);
+    Serial.print((unsigned char)key_4,HEX);
+      Serial.print((unsigned char)key_5,HEX);
+      Serial.println((unsigned char)key_6,HEX);
+      Serial.print("Block:");
+      Serial.println(block);
+     }
        }
       }
      }
