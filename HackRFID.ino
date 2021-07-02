@@ -75,18 +75,18 @@
   mfrc522.PICC_DumpDetailsToSerial(&(mfrc522.uid));
  
   //默认密码破解
-  for (key_6=0;key_6<256;key_6++){
-    key={(unsigned char)key_1,(unsigned char)key_2,(unsigned char)key_3,(unsigned char)key_4,(unsigned char)key_5,(unsigned char)key_6};
+  for (byte i=0;i<sizeof(Defualt_Key);i++){
+    key = Defualt_Key[i];
     status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, block, &key, &(mfrc522.uid));
     if (status == MFRC522::STATUS_OK) {
        delay(5000);
        Serial.print("PCD_Authenticate OK");
-       EEPROM.write(block*6-1,key_1);
-       EEPROM.write(block*6-1+1,key_2);
-       EEPROM.write(block*6-1+2,key_3);
-       EEPROM.write(block*6-1+3,key_4);
-       EEPROM.write(block*6-1+4,key_5);
-       EEPROM.write(block*6-1+5,key_6);
+       EEPROM.write(block*6,key.keyByte[0]);
+       EEPROM.write(block*6+1,key.keyByte[1]);
+       EEPROM.write(block*6+2,key.keyByte[2]);
+       EEPROM.write(block*6+3,key.keyByte[3]);
+       EEPROM.write(block*6+4,key.keyByte[4]);
+       EEPROM.write(block*6+5,key.keyByte[5]);
 
        // 读取区中数据
        byte byteCount = sizeof(buffer);
@@ -107,12 +107,6 @@
       Serial.print("Block:");
       Serial.println(block);
 
-      key_1=0;
-      key_2=0;
-      key_3=0;
-      key_4=0;
-      key_5=0;
-      key_6=0;  
       block++;
       mfrc522.PICC_HaltA(); // Halt PICC
       mfrc522.PCD_StopCrypto1();  // Stop encryption on PCD
@@ -124,7 +118,6 @@
       Serial.println(block);
      }
  }
-
 
   //暴力破解
   for (key_1=0;key_1<256;key_1++){
@@ -138,12 +131,12 @@
            if (status == MFRC522::STATUS_OK) {
               delay(5000);
               Serial.print("PCD_Authenticate OK");
-              EEPROM.write(block*6-1,key_1);
-              EEPROM.write(block*6-1+1,key_2);
-              EEPROM.write(block*6-1+2,key_3);
-              EEPROM.write(block*6-1+3,key_4);
-              EEPROM.write(block*6-1+4,key_5);
-              EEPROM.write(block*6-1+5,key_6);
+              EEPROM.write(block*6,key_1);
+              EEPROM.write(block*6+1,key_2);
+              EEPROM.write(block*6+2,key_3);
+              EEPROM.write(block*6+3,key_4);
+              EEPROM.write(block*6+4,key_5);
+              EEPROM.write(block*6+5,key_6);
   
               // 读取区中数据
               byte byteCount = sizeof(buffer);
