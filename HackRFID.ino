@@ -20,7 +20,7 @@
  byte block  = 0; //结构：0～15块，每块的第四区存有6bit keyA，4bit 控制字, 6 bit KeyB
  byte buffer[18]; //预留区读取缓存
 
- byte Defualt_Key[18]={{0xFF,0xFF,0xFF,0xFF,0xFF,0xFF},
+ byte Defualt_Key[18][6]={{0xFF,0xFF,0xFF,0xFF,0xFF,0xFF},
                        {0xA0,0xA1,0xA2,0xA3,0xA4,0xA5},
                        {0xD3,0xF7,0xD3,0xF7,0xD3,0xF7},
                        {0xA0,0xB0,0xC0,0xD0,0xE0,0xF0},
@@ -75,8 +75,10 @@
   mfrc522.PICC_DumpDetailsToSerial(&(mfrc522.uid));
  
   //默认密码破解
-  for (byte i=0;i<sizeof(Defualt_Key);i++){
-    key = Defualt_Key[i];
+  for (byte i=0;i<18;i++){
+   for (byte j=0;i<6;i++){
+    key.keyByte[j] = Defualt_Key[i][j];
+   }
     status = mfrc522.PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, block, &key, &(mfrc522.uid));
     if (status == MFRC522::STATUS_OK) {
        delay(5000);
