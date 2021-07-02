@@ -1,0 +1,6 @@
+1. 请求应答(ANSWER TO REQUEST): 寻卡 
+2. 防冲突(ANTICOLLISION): 选择唯一一张卡 
+3. 选择标记(SELECT): 激活所选择的卡 
+4. 认证(AUTHENTICATION): 安全性
+5. 读写操作(读、写、加值、减值): 交换数据(READ/WRITE/INCREAMENT/DECREMENT)
+6. 停止(HALT): 置卡为停止模式，防止重复操作
